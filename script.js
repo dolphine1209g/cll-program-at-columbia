@@ -74,3 +74,60 @@
   setActive(0);
   start();
 })();
+
+(function setupMobileReadMore() {
+  const MOBILE = window.matchMedia("(max-width: 768px)");
+
+  function initIntro(intro) {
+    if (intro.dataset.readmoreInit === "1") return;
+    intro.dataset.readmoreInit = "1";
+
+    // Wrap existing <p> in a .bio-text div (preserves your paragraphs)
+    const p = intro.querySelector("p");
+    if (!p) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "bio-text";
+
+    // Move ALL children (not just first p) into wrapper
+    while (intro.firstChild) wrapper.appendChild(intro.firstChild);
+    intro.appendChild(wrapper);
+
+    // Add toggle button
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "bio-toggle";
+    btn.textContent = "Read more";
+    intro.appendChild(btn);
+
+    btn.addEventListener("click", () => {
+      const collapsed = intro.classList.toggle("is-collapsed");
+      btn.textContent = collapsed ? "Read more" : "Read less";
+    });
+  }
+
+  function applyMode() {
+    document.querySelectorAll(".person-intro").forEach((intro) => {
+      initIntro(intro);
+
+      const btn = intro.querySelector(".bio-toggle");
+      if (!btn) return;
+
+      intro.classList.add("has-toggle");
+
+      if (MOBILE.matches) {
+        // Collapse on mobile by default
+        intro.classList.add("is-collapsed");
+        btn.textContent = "Read more";
+      } else {
+        // Expand on desktop and effectively hide the toggle (CSS handles)
+        intro.classList.remove("is-collapsed");
+        btn.textContent = "Read less";
+      }
+    });
+  }
+
+  applyMode();
+  MOBILE.addEventListener?.("change", applyMode);
+  window.addEventListener("resize", applyMode);
+})();
